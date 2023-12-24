@@ -14,7 +14,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void addToDoItem() {
     String enteredText = _textEditingController.text;
-    if (enteredText.isEmpty) return;
+    if (enteredText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("Please Write somthing first"),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'Close',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ));
+      return;
+    }
+    ;
     _textEditingController.text = "";
     setState(() {
       _todoItems.insert(0, ToDoItem(data: enteredText, checked: false));
@@ -32,15 +45,34 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("ToDo App"),
+        title: const Center(child: Text("ToDo App")),
+        scrolledUnderElevation: 2.0,
+        shadowColor: Theme.of(context).colorScheme.shadow,
+        actions: [
+          IconButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text("Will be added later"),
+                  duration: const Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: 'Close',
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
+                  ),
+                ));
+              },
+              icon: const Icon(Icons.person_2))
+        ],
       ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
         child: Column(
           children: [
             Expanded(
               child: _todoItems.isNotEmpty
                   ? ListView.builder(
+                      padding: const EdgeInsets.only(top: 10, bottom: 20),
                       itemCount: _todoItems.length,
                       itemBuilder: (context, index) {
                         return ToDoItemView(
@@ -53,8 +85,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       },
                     )
-                  : const Center(
-                      child: Text("No ToDo Task. Please Add!"),
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_box_outlined,
+                            color: Colors.green[300],
+                            size: 50,
+                          ),
+                          const SizedBox(height: 5),
+                          const Text("Please Add a ToDo Item"),
+                        ],
+                      ),
                     ),
             ),
             const SizedBox(height: 10),
