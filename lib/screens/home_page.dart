@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -11,6 +14,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<ToDoItem> _todoItems = [];
   final TextEditingController _textEditingController = TextEditingController();
+
+  void loginPage() {
+    // Navigator.pushNamed(context, 'signUp');
+  }
 
   void addToDoItem() {
     String enteredText = _textEditingController.text;
@@ -49,20 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
         scrolledUnderElevation: 2.0,
         shadowColor: Theme.of(context).colorScheme.shadow,
         actions: [
-          IconButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: const Text("Will be added later"),
-                  duration: const Duration(seconds: 2),
-                  action: SnackBarAction(
-                    label: 'Close',
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                  ),
-                ));
-              },
-              icon: const Icon(Icons.person_2))
+          IconButton(onPressed: loginPage, icon: const Icon(Icons.person_2))
         ],
       ),
       body: Container(
