@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
-
-final FirebaseAuth _auth = FirebaseAuth.instance;
+import 'package:flutter_todo_app/services/auth_services.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -15,8 +14,23 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<ToDoItem> _todoItems = [];
   final TextEditingController _textEditingController = TextEditingController();
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  AuthClass authClass = AuthClass();
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _auth.authStateChanges().listen((event) {
+      setState(() {
+        _user = event;
+      });
+    });
+  }
+
   void loginPage() {
-    // Navigator.pushNamed(context, 'signUp');
+    Navigator.pushNamed(context, 'signUp');
   }
 
   void addToDoItem() {
@@ -55,69 +69,88 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Center(child: Text("ToDo App")),
         scrolledUnderElevation: 2.0,
         shadowColor: Theme.of(context).colorScheme.shadow,
-        actions: [
-          IconButton(onPressed: loginPage, icon: const Icon(Icons.person_2))
-        ],
+        actions: _user == null
+            ? [
+                IconButton(
+                    onPressed: loginPage,
+                    icon: const Icon(
+                      Icons.login,
+                      color: Colors.black,
+                    ))
+              ]
+            : [
+                Text(_user?.displayName ?? ""),
+                IconButton(
+                    onPressed: authClass.handleSignOut,
+                    icon: const Icon(
+                      Icons.person_2_sharp,
+                      color: Colors.black,
+                    ))
+              ],
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-        child: Column(
-          children: [
-            Expanded(
-              child: _todoItems.isNotEmpty
-                  ? ListView.builder(
-                      padding: const EdgeInsets.only(top: 10, bottom: 20),
-                      itemCount: _todoItems.length,
-                      itemBuilder: (context, index) {
-                        return ToDoItemView(
-                          task: _todoItems[index],
-                          index: index,
-                          deletetask: (idx) {
-                            deleteToDoItem(idx);
-                          },
-                          updatetask: (idx) {},
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_box_outlined,
-                            color: Colors.green[300],
-                            size: 50,
+        child: _user != null
+            ? Column(
+                children: [
+                  Expanded(
+                    child: _todoItems.isNotEmpty
+                        ? ListView.builder(
+                            padding: const EdgeInsets.only(top: 10, bottom: 20),
+                            itemCount: _todoItems.length,
+                            itemBuilder: (context, index) {
+                              return ToDoItemView(
+                                task: _todoItems[index],
+                                index: index,
+                                deletetask: (idx) {
+                                  deleteToDoItem(idx);
+                                },
+                                updatetask: (idx) {},
+                              );
+                            },
+                          )
+                        : Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_box_outlined,
+                                  color: Colors.green[300],
+                                  size: 50,
+                                ),
+                                const SizedBox(height: 5),
+                                const Text("Please Add a ToDo Item"),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 5),
-                          const Text("Please Add a ToDo Item"),
-                        ],
-                      ),
-                    ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _textEditingController,
-                      decoration: const InputDecoration(
-                          hintText: 'Type something...',
-                          border: OutlineInputBorder()),
-                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                FloatingActionButton(
-                  onPressed: addToDoItem,
-                  tooltip: 'Increment',
-                  child: const Icon(Icons.add),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: _textEditingController,
+                            decoration: const InputDecoration(
+                                hintText: 'Type something...',
+                                border: OutlineInputBorder()),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      FloatingActionButton(
+                        onPressed: addToDoItem,
+                        tooltip: 'Increment',
+                        child: const Icon(Icons.add),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Center(
+                child: ElevatedButton(
+                    onPressed: loginPage, child: Text("Sign in to Continue"))),
       ),
     );
   }
