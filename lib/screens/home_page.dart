@@ -3,6 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
 import 'package:flutter_todo_app/services/auth_services.dart';
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/todo_provider.dart';
+import '../widgets/list_shimmer.dart';
+import '../widgets/todo_item_widget.dart';
+import 'add_todo_page.dart';
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -11,17 +20,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<ToDoItem> _todoItems = [];
-  final TextEditingController _textEditingController = TextEditingController();
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   AuthClass authClass = AuthClass();
   User? _user;
 
+  final autoSizeGroup = AutoSizeGroup();
+  var _bottomNavIndex = 0; //default index of a first screen
+
+  final iconList = <IconData>[
+    Icons.home,
+    Icons.settings,
+  ];
+  final navItems = ["Home", "Settings"];
+
   @override
   void initState() {
     super.initState();
-
     _auth.authStateChanges().listen((event) {
       setState(() {
         _user = event;
@@ -33,40 +47,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.pushNamed(context, 'signUp');
   }
 
-  void addToDoItem() {
-    String enteredText = _textEditingController.text;
-    if (enteredText.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text("Please Write somthing first"),
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'Close',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
-      ));
-      return;
-    }
-    ;
-    _textEditingController.text = "";
-    setState(() {
-      _todoItems.insert(0, ToDoItem(data: enteredText, checked: false));
-    });
-  }
-
-  void deleteToDoItem(int idx) {
-    setState(() {
-      _todoItems.removeAt(idx);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final todoProvider = Provider.of<ToDoProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Center(child: Text("ToDo App")),
+        title: const Text("My Schedules"),
         scrolledUnderElevation: 2.0,
         shadowColor: Theme.of(context).colorScheme.shadow,
         actions: _user == null
@@ -75,7 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: loginPage,
                     icon: const Icon(
                       Icons.login,
-                      color: Colors.black,
                     ))
               ]
             : [
@@ -84,7 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: authClass.handleSignOut,
                     icon: const Icon(
                       Icons.person_2_sharp,
-                      color: Colors.black,
                     ))
               ],
       ),
@@ -94,65 +79,130 @@ class _MyHomePageState extends State<MyHomePage> {
             ? Column(
                 children: [
                   Expanded(
-                    child: _todoItems.isNotEmpty
-                        ? ListView.builder(
-                            padding: const EdgeInsets.only(top: 10, bottom: 20),
-                            itemCount: _todoItems.length,
-                            itemBuilder: (context, index) {
-                              return ToDoItemView(
-                                task: _todoItems[index],
-                                index: index,
-                                deletetask: (idx) {
-                                  deleteToDoItem(idx);
-                                },
-                                updatetask: (idx) {},
-                              );
-                            },
-                          )
-                        : Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_box_outlined,
-                                  color: Colors.green[300],
-                                  size: 50,
-                                ),
-                                const SizedBox(height: 5),
-                                const Text("Please Add a ToDo Item"),
-                              ],
-                            ),
-                          ),
+                    child: FutureBuilder(
+                      future: todoProvider.fetchData(_user!.uid),
+                      builder: (context, snapshot) {
+                        if (!todoProvider.itemsLoaded) {
+                          return const ShimmerListItem();
+                        } else {
+                          return todoProvider.todoList.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    "No ToDo Yet!",
+                                    style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w300),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: todoProvider.todoList.length,
+                                  itemBuilder: (context, index) {
+                                    final todo = todoProvider.todoList[index];
+                                    return ToDoItemWidget(
+                                      toDoItem: todo,
+                                      onCheckboxChanged: (id, value) {
+                                        todoProvider.updateCheckBox(id, value);
+                                      },
+                                      onDelete: (id) {
+                                        todoProvider.deleteToDo(id);
+                                      },
+                                    );
+                                  },
+                                );
+                        }
+                      },
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextField(
-                            controller: _textEditingController,
-                            decoration: const InputDecoration(
-                                hintText: 'Type something...',
-                                border: OutlineInputBorder()),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      FloatingActionButton(
-                        onPressed: addToDoItem,
-                        tooltip: 'Increment',
-                        child: const Icon(Icons.add),
-                      ),
-                    ],
-                  ),
                 ],
               )
             : Center(
-                child: ElevatedButton(
-                    onPressed: loginPage, child: Text("Sign in to Continue"))),
+                child: OutlinedButton(
+                    onPressed: loginPage,
+                    child: const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Text("Sign in to Continue"),
+                    ))),
       ),
+      bottomNavigationBar: bottomNavBar(),
+      floatingActionButton: (_user == null)
+          ? null
+          : FloatingActionButton(
+              shape: const CircleBorder(),
+              onPressed: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) {
+                    return AddToDoPage(
+                      onAddToDo: (data) {
+                        todoProvider.addToDoTo(data);
+                      },
+                    );
+                  },
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  void noItemPlaceholder() {}
+
+  Widget? bottomNavBar() {
+    return (_user == null)
+        ? null
+        : Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              AnimatedBottomNavigationBar.builder(
+                height: 64,
+                itemCount: iconList.length,
+                tabBuilder: (int index, bool isActive) {
+                  final color = isActive ? Colors.green : Colors.grey;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        iconList[index],
+                        size: 24,
+                        color: color,
+                      ),
+                      const SizedBox(height: 3),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: AutoSizeText(
+                          navItems[index],
+                          maxLines: 1,
+                          style: TextStyle(color: color),
+                          group: autoSizeGroup,
+                        ),
+                      )
+                    ],
+                  );
+                },
+                backgroundColor: Theme.of(context).colorScheme.background,
+                activeIndex: _bottomNavIndex,
+                splashSpeedInMilliseconds: 250,
+                notchSmoothness: NotchSmoothness.defaultEdge,
+                gapLocation: GapLocation.center,
+                leftCornerRadius: 8,
+                splashRadius: 0,
+                rightCornerRadius: 8,
+                elevation: 8,
+                onTap: (index) => setState(() => _bottomNavIndex = index),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Text(
+                  "Create",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            ],
+          );
   }
 }
 
@@ -180,7 +230,7 @@ class _ToDoItemViewState extends State<ToDoItemView> {
     return Card(
       child: ListTile(
         title: Text(
-          widget.task.data,
+          widget.task.title,
           style: TextStyle(
               decoration: (widget.task.checked)
                   ? TextDecoration.lineThrough
