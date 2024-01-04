@@ -6,6 +6,7 @@ import 'package:flutter_todo_app/services/auth_services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../providers/todo_provider.dart';
 import '../widgets/list_shimmer.dart';
@@ -23,6 +24,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   AuthClass authClass = AuthClass();
   User? _user;
+
+  final todoListKey = GlobalKey<AnimatedListState>();
 
   final autoSizeGroup = AutoSizeGroup();
   var _bottomNavIndex = 0; //default index of a first screen
@@ -47,213 +50,258 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.pushNamed(context, 'signUp');
   }
 
+  void addTodoItem(ToDoProvider todoProvider, ToDoItem todo) {
+    int indx = todoProvider.addToDoTo(todo);
+
+    if (todoListKey.currentState == null) {
+      todoProvider.notify();
+      return;
+    }
+
+    todoListKey.currentState!
+        .insertItem(indx, duration: const Duration(milliseconds: 450));
+  }
+
+  void deleteToDoItem(ToDoProvider todoProvider, int index) {
+    var todo = todoProvider.todoList[index];
+    todoProvider.deleteToDo(todo.id);
+
+    todoListKey.currentState!.removeItem(index, (context, animation) {
+      return SizeTransition(
+        sizeFactor: animation,
+        child: FadeTransition(
+          opacity: Tween<double>(begin: 0, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeInBack),
+          ),
+          child: ToDoItemWidget(
+            toDoItem: todo,
+            onDelete: () => null,
+            onCheckboxChanged: (_, __) => null,
+          ),
+        ),
+      );
+    }, duration: const Duration(milliseconds: 450));
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_user == null) {
+      return _noUserScreen();
+    }
+
     final todoProvider = Provider.of<ToDoProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Schedules"),
-        scrolledUnderElevation: 2.0,
-        shadowColor: Theme.of(context).colorScheme.shadow,
-        actions: _user == null
-            ? [
-                IconButton(
-                    onPressed: loginPage,
-                    icon: const Icon(
-                      Icons.login,
-                    ))
-              ]
-            : [
-                Text(_user?.displayName ?? ""),
-                IconButton(
-                    onPressed: authClass.handleSignOut,
-                    icon: const Icon(
-                      Icons.person_2_sharp,
-                    ))
-              ],
-      ),
+      appBar: _buildAppBar(context),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-        child: _user != null
-            ? Column(
-                children: [
-                  Expanded(
-                    child: FutureBuilder(
-                      future: todoProvider.fetchData(_user!.uid),
-                      builder: (context, snapshot) {
-                        if (!todoProvider.itemsLoaded) {
-                          return const ShimmerListItem();
-                        } else {
-                          return todoProvider.todoList.isEmpty
-                              ? const Center(
-                                  child: Text(
-                                    "No ToDo Yet!",
-                                    style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w300),
-                                  ),
-                                )
-                              : ListView.builder(
-                                  itemCount: todoProvider.todoList.length,
-                                  itemBuilder: (context, index) {
-                                    final todo = todoProvider.todoList[index];
-                                    return ToDoItemWidget(
-                                      toDoItem: todo,
-                                      onCheckboxChanged: (id, value) {
-                                        todoProvider.updateCheckBox(id, value);
-                                      },
-                                      onDelete: (id) {
-                                        todoProvider.deleteToDo(id);
-                                      },
-                                    );
-                                  },
-                                );
-                        }
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+          child: Column(
+            children: [
+              Expanded(
+                child: FutureBuilder(
+                  future: todoProvider.fetchData(_user!.uid),
+                  builder: (context, snapshot) {
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 450),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return ScaleTransition(scale: animation, child: child);
                       },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              )
-            : Center(
-                child: OutlinedButton(
-                    onPressed: loginPage,
-                    child: const Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Text("Sign in to Continue"),
-                    ))),
-      ),
-      bottomNavigationBar: bottomNavBar(),
-      floatingActionButton: (_user == null)
-          ? null
-          : FloatingActionButton(
-              shape: const CircleBorder(),
-              onPressed: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) {
-                    return AddToDoPage(
-                      onAddToDo: (data) {
-                        todoProvider.addToDoTo(data);
-                      },
+                      child: (!todoProvider.itemsLoaded)
+                          ? const ShimmerListItem()
+                          : AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 450),
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                return ScaleTransition(
+                                    scale: animation, child: child);
+                              },
+                              child: todoProvider.todoList.isEmpty
+                                  ? _emptyListPlaceHolder()
+                                  : _todoListView(todoProvider),
+                            ),
                     );
                   },
-                );
-              },
-              child: const Icon(Icons.add),
-            ),
+                ),
+              ),
+            ],
+          )),
+      bottomNavigationBar: bottomNavBar(),
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        tooltip: "Create ToDo",
+        onPressed: () {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return AddToDoPage(
+                onAddToDo: (todo) {
+                  addTodoItem(todoProvider, todo);
+                },
+              );
+            },
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  void noItemPlaceholder() {}
+  Widget _todoListView(ToDoProvider todoProvider) {
+    return AnimatedList(
+      key: todoListKey,
+      padding: const EdgeInsets.only(bottom: 30),
+      initialItemCount: todoProvider.todoList.length,
+      itemBuilder: (context, index, animation) {
+        return SizeTransition(
+          sizeFactor: animation,
+          child: ToDoItemWidget(
+            toDoItem: todoProvider.todoList[index],
+            onCheckboxChanged: (id, value) {
+              todoProvider.updateCheckBox(id, value);
+            },
+            onDelete: () {
+              deleteToDoItem(todoProvider, index);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Scaffold _noUserScreen() {
+    return Scaffold(
+      body: Center(
+        child: OutlinedButton(
+          onPressed: loginPage,
+          child: const Padding(
+            padding: EdgeInsets.all(12),
+            child: Text("Sign in to Continue"),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Center _emptyListPlaceHolder() {
+    return const Center(
+      child: Text(
+        "No ToDo Yet!",
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
+      ),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: authClass.handleSignOut,
+      ),
+      scrolledUnderElevation: 2.0,
+      shadowColor: Theme.of(context).colorScheme.shadow,
+      actions: [
+        Padding(
+          padding:
+              const EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 18),
+          child: _user!.photoURL != null
+              ? Stack(
+                  children: [
+                    ClipOval(
+                      child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Colors.blue,
+                              Colors.green,
+                              Colors.blue,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: _user!.photoURL!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : IconButton(
+                  onPressed: authClass.handleSignOut,
+                  icon: const Icon(
+                    Icons.person_2_sharp,
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
 
   Widget? bottomNavBar() {
-    return (_user == null)
-        ? null
-        : Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              AnimatedBottomNavigationBar.builder(
-                height: 64,
-                itemCount: iconList.length,
-                tabBuilder: (int index, bool isActive) {
-                  final color = isActive ? Colors.green : Colors.grey;
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        iconList[index],
-                        size: 24,
-                        color: color,
-                      ),
-                      const SizedBox(height: 3),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: AutoSizeText(
-                          navItems[index],
-                          maxLines: 1,
-                          style: TextStyle(color: color),
-                          group: autoSizeGroup,
-                        ),
-                      )
-                    ],
-                  );
-                },
-                backgroundColor: Theme.of(context).colorScheme.background,
-                activeIndex: _bottomNavIndex,
-                splashSpeedInMilliseconds: 250,
-                notchSmoothness: NotchSmoothness.defaultEdge,
-                gapLocation: GapLocation.center,
-                leftCornerRadius: 8,
-                splashRadius: 0,
-                rightCornerRadius: 8,
-                elevation: 8,
-                onTap: (index) => setState(() => _bottomNavIndex = index),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 4),
-                child: Text(
-                  "Create",
-                  style: TextStyle(color: Colors.grey),
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        AnimatedBottomNavigationBar.builder(
+          height: 64,
+          itemCount: iconList.length,
+          tabBuilder: (int index, bool isActive) {
+            final color =
+                isActive ? Theme.of(context).colorScheme.primary : Colors.grey;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  iconList[index],
+                  size: 24,
+                  color: color,
                 ),
-              ),
-            ],
-          );
-  }
-}
-
-class ToDoItemView extends StatefulWidget {
-  const ToDoItemView({
-    super.key,
-    required this.task,
-    required this.index,
-    required this.deletetask,
-    required this.updatetask,
-  });
-
-  final ToDoItem task;
-  final int index;
-  final void Function(dynamic idx) deletetask;
-  final void Function(dynamic idx) updatetask;
-
-  @override
-  State<ToDoItemView> createState() => _ToDoItemViewState();
-}
-
-class _ToDoItemViewState extends State<ToDoItemView> {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          widget.task.title,
-          style: TextStyle(
-              decoration: (widget.task.checked)
-                  ? TextDecoration.lineThrough
-                  : TextDecoration.none),
-        ),
-        leading: Checkbox(
-          onChanged: (bool? value) {
-            setState(() {
-              widget.task.checked = !widget.task.checked;
-            });
-            widget.updatetask(widget.index);
+                const SizedBox(height: 3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: AutoSizeText(
+                    navItems[index],
+                    maxLines: 1,
+                    style: TextStyle(color: color),
+                    group: autoSizeGroup,
+                  ),
+                )
+              ],
+            );
           },
-          value: widget.task.checked,
+          backgroundColor: Theme.of(context).colorScheme.background,
+          activeIndex: _bottomNavIndex,
+          splashSpeedInMilliseconds: 250,
+          notchSmoothness: NotchSmoothness.defaultEdge,
+          gapLocation: GapLocation.center,
+          leftCornerRadius: 8,
+          rightCornerRadius: 8,
+          splashRadius: 0,
+          elevation: 32,
+          onTap: (index) => setState(() => _bottomNavIndex = index),
         ),
-        trailing: IconButton(
-            onPressed: () {
-              widget.deletetask(widget.index);
-            },
-            icon: const Icon(
-              Icons.delete,
-              color: Colors.red,
-            )),
-      ),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 4),
+          child: Text(
+            "Create",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      ],
     );
   }
 }

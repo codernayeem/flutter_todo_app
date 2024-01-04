@@ -42,9 +42,10 @@ class ToDoProvider with ChangeNotifier {
     }
   }
 
-  void addToDoTo(ToDoItem todo) {
+  int addToDoTo(ToDoItem todo) {
+    int insert_index = 0;
     todo.resetUuid(); // make a new id
-    _todoList.add(todo);
+    _todoList.insert(insert_index, todo);
 
     todosRef.doc(todo.id).set({
       "user_id": _userId,
@@ -54,8 +55,7 @@ class ToDoProvider with ChangeNotifier {
       "desc": todo.desc,
       "category": todo.category.name,
     });
-
-    notifyListeners();
+    return insert_index;
   }
 
   void updateToDo(String id, ToDoItem todo) {
@@ -90,8 +90,11 @@ class ToDoProvider with ChangeNotifier {
     });
   }
 
-  void deleteToDo(String id) {
-    _todoList.removeWhere((element) => element.id == id);
+  int deleteToDo(String id) {
+    int idx = findIndexById(id);
+    if (idx == -1) return -1;
+
+    _todoList.removeAt(idx);
 
     if (todoList.isEmpty) {
       notifyListeners();
@@ -102,5 +105,10 @@ class ToDoProvider with ChangeNotifier {
     } catch (e) {
       print("Delete Error : $e");
     }
+    return idx;
+  }
+
+  void notify() {
+    notifyListeners();
   }
 }
