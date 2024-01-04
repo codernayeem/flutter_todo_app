@@ -28,12 +28,15 @@ class MyApp extends StatelessWidget {
         title: 'ToDo App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(0, 137, 96, 72),
+              brightness: Brightness.light),
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0x785642), brightness: Brightness.light),
+              seedColor: const Color.fromARGB(0, 137, 96, 72),
+              brightness: Brightness.dark),
           useMaterial3: true,
         ),
         home: const MyHomePage(),
