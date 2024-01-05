@@ -47,22 +47,6 @@ class _AddToDoPageState extends State<AddToDoPage> {
 
   void _submitToDoData() {
     if (_titleController.text.trim().isEmpty) {
-      // showDialog(
-      //   context: context,
-      //   builder: (ctx) => AlertDialog(
-      //     title: const Text('Invalid input'),
-      //     content: const Text(
-      //         'Please make sure a valid title, amount, date and category was entered.'),
-      //     actions: [
-      //       TextButton(
-      //         onPressed: () {
-      //           Navigator.pop(ctx);
-      //         },
-      //         child: const Text('Okay'),
-      //       ),
-      //     ],
-      //   ),
-      // );
       FocusScope.of(context).requestFocus(_focusNode);
       return;
     }
@@ -101,9 +85,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                 child: const Text(
                   "Create \nNew Todo",
                   style: TextStyle(
-                    color: Colors.black,
                     fontSize: 30,
-                    fontFamily: 'Poppins',
                     fontWeight: FontWeight.w700,
                     height: 0,
                   ),
@@ -124,9 +106,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
               const Text(
                 "Task Title",
                 style: TextStyle(
-                  color: Colors.black,
                   fontSize: 18,
-                  fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                   height: 0,
                 ),
@@ -156,10 +136,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
             maxLines: 1,
             decoration: InputDecoration(
               filled: true,
-              fillColor: const Color.fromARGB(255, 237, 192, 183),
               hintText: 'Title',
-              hintStyle:
-                  const TextStyle(color: Color.fromARGB(255, 136, 107, 107)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0),
                 borderSide: const BorderSide(
@@ -209,7 +186,6 @@ class _AddToDoPageState extends State<AddToDoPage> {
             child: Text(
               "Description (Optional)",
               style: TextStyle(
-                color: Colors.black,
                 fontSize: 18,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
@@ -228,10 +204,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
               textAlignVertical: TextAlignVertical.top,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: const Color.fromARGB(255, 237, 192, 183),
                 hintText: 'Description',
-                hintStyle:
-                    const TextStyle(color: Color.fromARGB(255, 136, 107, 107)),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: const BorderSide(
@@ -250,10 +223,10 @@ class _AddToDoPageState extends State<AddToDoPage> {
           const SizedBox(height: 16),
           FilledButton(
               onPressed: _submitToDoData,
-              child: Container(
+              child: const SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: const Center(
+                child: Center(
                     child: Text(
                   "Add",
                   style: TextStyle(

@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../providers/todo_provider.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/list_shimmer.dart';
 import '../widgets/todo_item_widget.dart';
 import 'add_todo_page.dart';
@@ -93,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: _buildAppBar(context),
+      drawer: AppDrawer(user: _user),
       body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
           child: Column(
@@ -196,57 +198,48 @@ class _MyHomePageState extends State<MyHomePage> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.menu),
-        onPressed: authClass.handleSignOut,
-      ),
       scrolledUnderElevation: 2.0,
       shadowColor: Theme.of(context).colorScheme.shadow,
+      title: const Text("My Tasks"),
       actions: [
         Padding(
-          padding:
-              const EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 18),
-          child: _user!.photoURL != null
-              ? Stack(
-                  children: [
-                    ClipOval(
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Colors.blue,
-                              Colors.green,
-                              Colors.blue,
-                            ],
+            padding:
+                const EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 18),
+            child: _user!.photoURL != null
+                ? Stack(
+                    children: [
+                      ClipOval(
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: const LinearGradient(
+                              colors: [
+                                Colors.blue,
+                                Colors.green,
+                                Colors.blue,
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: _user!.photoURL!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                      Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: _user!.photoURL!,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                )
-              : IconButton(
-                  onPressed: authClass.handleSignOut,
-                  icon: const Icon(
-                    Icons.person_2_sharp,
-                  ),
-                ),
-        ),
+                    ],
+                  )
+                : null),
       ],
     );
   }

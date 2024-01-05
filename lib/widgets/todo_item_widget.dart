@@ -41,8 +41,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
           ),
           Expanded(
             child: Card(
-              elevation: 8.0,
-              color: const Color.fromARGB(255, 254, 236, 232),
+              elevation: 6.0,
               child: InkWell(
                 onTap: () {},
                 child: Row(
@@ -107,8 +106,9 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                     ),
                     IconButton(
                       onPressed: widget.onDelete,
-                      icon: const Icon(Icons.delete,
-                          color: Color.fromARGB(255, 186, 39, 29)),
+                      icon: const Icon(
+                        Icons.delete,
+                      ),
                     ),
                   ],
                 ),

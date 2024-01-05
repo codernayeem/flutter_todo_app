@@ -48,7 +48,7 @@ class _CategorySelectorState extends State<CategorySelector> {
               }
             },
             // selectedColor: widget.categories[index].color,
-            selectedColor: const Color.fromARGB(255, 237, 192, 183),
+            // selectedColor: const Color.fromARGB(255, 237, 192, 183),
           );
         }),
       ),

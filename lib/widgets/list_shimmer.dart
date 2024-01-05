@@ -7,8 +7,12 @@ class ShimmerListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: Theme.of(context).brightness == Brightness.light
+          ? Colors.grey[300]!
+          : Colors.grey[800]!,
+      highlightColor: Theme.of(context).brightness == Brightness.light
+          ? Colors.grey[100]!
+          : const Color.fromARGB(255, 55, 55, 55),
       child: Column(
         children: [
           listItem(),
