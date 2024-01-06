@@ -19,6 +19,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
   late DateTime _selectedDate;
   CategoryItem _selectedCategory = CategoryItem.defaultCat();
 
+  bool _titleZoomed = false;
+
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -26,6 +28,20 @@ class _AddToDoPageState extends State<AddToDoPage> {
     _selectedDate = DateTime.now();
     _focusNode.requestFocus();
     super.initState();
+  }
+
+  void _toggleZoom() {
+    setState(() {
+      _titleZoomed = !_titleZoomed;
+
+      if (_titleZoomed) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          setState(() {
+            _titleZoomed = false;
+          });
+        });
+      }
+    });
   }
 
   void _presentDatePicker() async {
@@ -48,6 +64,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
   void _submitToDoData() {
     if (_titleController.text.trim().isEmpty) {
       FocusScope.of(context).requestFocus(_focusNode);
+      _toggleZoom();
       return;
     }
 
@@ -103,13 +120,21 @@ class _AddToDoPageState extends State<AddToDoPage> {
           const SizedBox(height: 10),
           Row(
             children: [
-              const Text(
-                "Task Title",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  height: 0,
-                ),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: _titleZoomed
+                    ? TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      )
+                    : TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                curve: Curves.ease,
+                child: const Text("Task Title"),
               ),
               const SizedBox(width: 16),
               Expanded(
