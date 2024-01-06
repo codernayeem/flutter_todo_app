@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_todo_app/firebase_options.dart';
+import 'package:flutter_todo_app/providers/category_provider.dart';
 import 'package:flutter_todo_app/providers/todo_provider.dart';
 import 'package:flutter_todo_app/screens/phone_auth.dart';
 import 'package:flutter_todo_app/screens/sign_up_page.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ToDoProvider()),
+        ChangeNotifierProvider(create: (context) => CategoryProvider()),
       ],
       child: ThemeProvider(
         saveThemesOnChange: true,

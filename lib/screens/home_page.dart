@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
+import 'package:flutter_todo_app/providers/category_provider.dart';
 import 'package:flutter_todo_app/services/auth_services.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -10,6 +11,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../providers/todo_provider.dart';
 import '../widgets/app_drawer.dart';
+import '../widgets/category_view_list.dart';
 import '../widgets/list_shimmer.dart';
 import '../widgets/todo_item_widget.dart';
 import 'add_todo_page.dart';
@@ -43,6 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _auth.authStateChanges().listen((event) {
       setState(() {
         _user = event;
+        context.read<ToDoProvider>().reset();
+        context.read<CategoryProvider>().reset();
       });
     });
   }
@@ -90,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return _noUserScreen();
     }
 
-    final todoProvider = Provider.of<ToDoProvider>(context);
+    final todoProvider = Provider.of<ToDoProvider>(context, listen: true);
+    final catProvider = Provider.of<CategoryProvider>(context, listen: false);
 
     return Scaffold(
       appBar: _buildAppBar(context),
@@ -99,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
           child: Column(
             children: [
+              const CaegoryListView(),
               Expanded(
                 child: FutureBuilder(
                   future: todoProvider.fetchData(_user!.uid),
@@ -107,7 +113,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       duration: const Duration(milliseconds: 450),
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
-                        return ScaleTransition(scale: animation, child: child);
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, .1),
+                                end: const Offset(0, 0),
+                              ).animate(animation),
+                              child: child),
+                        );
                       },
                       child: (!todoProvider.itemsLoaded)
                           ? const ShimmerListItem()
@@ -119,8 +133,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                     scale: animation, child: child);
                               },
                               child: todoProvider.todoList.isEmpty
-                                  ? _emptyListPlaceHolder()
-                                  : _todoListView(todoProvider),
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        // to make it in center
+                                        // categoryItemView's height: 108
+                                        _emptyListPlaceHolder(),
+                                        const SizedBox(height: 108)
+                                      ],
+                                    )
+                                  : _todoListView(todoProvider, catProvider),
                             ),
                     );
                   },
@@ -140,6 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return AddToDoPage(
                 onAddToDo: (todo) {
                   addTodoItem(todoProvider, todo);
+                  catProvider.addCategory(todo.category);
                 },
               );
             },
@@ -151,21 +175,25 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _todoListView(ToDoProvider todoProvider) {
+  Widget _todoListView(
+      ToDoProvider todoProvider, CategoryProvider catProvider) {
     return AnimatedList(
       key: todoListKey,
       padding: const EdgeInsets.only(bottom: 30),
       initialItemCount: todoProvider.todoList.length,
       itemBuilder: (context, index, animation) {
+        ToDoItem todo = todoProvider.todoList[index];
         return SizeTransition(
           sizeFactor: animation,
           child: ToDoItemWidget(
-            toDoItem: todoProvider.todoList[index],
+            toDoItem: todo,
             onCheckboxChanged: (id, value) {
               todoProvider.updateCheckBox(id, value);
+              catProvider.updateCheckBox(todo.category, value);
             },
             onDelete: () {
               deleteToDoItem(todoProvider, index);
+              catProvider.deleteToDoOfCategory(todo.category, todo.checked);
             },
           ),
         );
@@ -187,11 +215,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Center _emptyListPlaceHolder() {
-    return const Center(
-      child: Text(
-        "No ToDo Yet!",
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
+  Widget _emptyListPlaceHolder() {
+    return const Expanded(
+      child: Center(
+        child: Text(
+          "No ToDo Yet!",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
+        ),
       ),
     );
   }

@@ -4,13 +4,13 @@ import 'package:uuid/uuid.dart';
 const uuid = Uuid();
 
 const categoryIcons = {
-  "general": Icons.home,
-  "food": Icons.lunch_dining,
-  "travel": Icons.flight_takeoff,
-  "leisure": Icons.movie,
-  "work": Icons.work,
-  "study": Icons.edit,
-  "others": Icons.other_houses,
+  "general": Icons.notes_sharp,
+  "food": Icons.lunch_dining_outlined,
+  "travel": Icons.flight_takeoff_rounded,
+  "leisure": Icons.movie_creation_outlined,
+  "work": Icons.work_outline,
+  "study": Icons.edit_outlined,
+  "others": Icons.other_houses_outlined,
 };
 
 class CategoryItem {
@@ -29,4 +29,16 @@ class CategoryItem {
     return CategoryItem(
         name: "General", icon: categoryIcons["general"], color: Colors.blue);
   }
+}
+
+class CategoryViewItem {
+  CategoryViewItem({
+    required this.category,
+    required this.total,
+    required this.completed,
+  });
+
+  CategoryItem category;
+  int total;
+  int completed;
 }
