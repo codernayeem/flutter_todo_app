@@ -100,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: _buildAppBar(context),
       drawer: AppDrawer(user: _user),
+      extendBody: true,
       body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
           child: Column(
@@ -179,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ToDoProvider todoProvider, CategoryProvider catProvider) {
     return AnimatedList(
       key: todoListKey,
-      padding: const EdgeInsets.only(bottom: 30),
+      padding: const EdgeInsets.only(bottom: 100),
       initialItemCount: todoProvider.todoList.length,
       itemBuilder: (context, index, animation) {
         ToDoItem todo = todoProvider.todoList[index];
