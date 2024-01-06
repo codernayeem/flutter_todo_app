@@ -4,6 +4,7 @@ import 'package:flutter_todo_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../models/category_item.dart';
+import 'category_shimmer.dart';
 import 'category_view_item.dart';
 
 class CaegoryListView extends StatefulWidget {
@@ -31,7 +32,7 @@ class _CaegoryListViewState extends State<CaegoryListView> {
                   return ScaleTransition(scale: animation, child: child);
                 },
                 child: (!categoryProvider.categoriesLoaded)
-                    ? const Placeholder(fallbackHeight: 108)
+                    ? const CategoryShimmer()
                     : AnimatedSwitcher(
                         duration: const Duration(milliseconds: 400),
                         transitionBuilder:
@@ -47,7 +48,6 @@ class _CaegoryListViewState extends State<CaegoryListView> {
                           );
                         },
                         child: categoryProvider.categoriesList.isEmpty
-                            // ? _emptyListPlaceHolder()
                             ? null
                             : _catsListView(categoryProvider.categoriesList),
                       ),
@@ -68,11 +68,4 @@ class _CaegoryListViewState extends State<CaegoryListView> {
       },
     );
   }
-
-  // Widget? _emptyListPlaceHolder() {
-  //   return Container(
-  //     color: Colors.amber,
-  //   );
-  //   // return const Text("No Cats Yet");
-  // }
 }
