@@ -140,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         // to make it in center
                                         // categoryItemView's height: 108
                                         _emptyListPlaceHolder(),
-                                        const SizedBox(height: 108)
+                                        const SizedBox(height: 108 + 108 / 2)
                                       ],
                                     )
                                   : _todoListView(todoProvider, catProvider),
@@ -186,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return SizeTransition(
           sizeFactor: animation,
           child: ToDoItemWidget(
+            key: ValueKey(todo.id),
             toDoItem: todo,
             onCheckboxChanged: (id, value) {
               todoProvider.updateCheckBox(id, value);
