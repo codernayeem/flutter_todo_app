@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/widgets/todo_details_widget.dart';
 import '../models/todo_item.dart';
 
 class ToDoItemWidget extends StatefulWidget {
@@ -29,6 +30,17 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
 
   bool dissmis = false;
 
+  void onClick() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ToDoDetailsWidget(
+          toDoItem: widget.toDoItem,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final icon = widget.toDoItem.category.getIcon();
@@ -45,7 +57,7 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
             child: Card(
               elevation: 6.0,
               child: InkWell(
-                onTap: () {},
+                onTap: onClick,
                 child: Row(
                   children: [
                     Expanded(
