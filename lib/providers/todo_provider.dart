@@ -68,22 +68,23 @@ class ToDoProvider with ChangeNotifier {
     return insertIndex;
   }
 
-  // void updateToDo(String id, ToDoItem todo) {
-  //   int index = findIndexById(id);
+  void updateToDo(ToDoItem todo, String? id) {
+    id ??= todo.id;
+    int index = findIndexById(id);
 
-  //   if (index == -1) return;
+    if (index == -1) return;
 
-  //   _todoList[index] = todo;
+    _todoList[index] = todo;
 
-  //   todosRef.doc(todo.id).update({
-  //     "title": todo.title,
-  //     "checked": todo.checked,
-  //     "date": todo.date,
-  //     "desc": todo.desc,
-  //     "category": todo.category,
-  //     "category": todo.category.icon,
-  //   });
-  // }
+    todosRef.doc(id).update({
+      "title": todo.title,
+      "checked": todo.checked,
+      "date": todo.date.millisecondsSinceEpoch,
+      "desc": todo.desc,
+      "category": todo.category.name,
+      "category_icon": todo.category.icon,
+    });
+  }
 
   int findIndexById(String id) {
     return _todoList.indexWhere((element) => element.id == id);

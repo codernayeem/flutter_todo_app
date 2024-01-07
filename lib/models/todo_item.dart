@@ -30,4 +30,13 @@ class ToDoItem {
   void resetUuid() {
     id = uuid.v4();
   }
+
+  void copyFrom(ToDoItem todo) {
+    id = todo.id;
+    title = todo.title;
+    desc = todo.desc;
+    checked = todo.checked;
+    date = todo.date;
+    category = todo.category;
+  }
 }

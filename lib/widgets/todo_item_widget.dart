@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/providers/todo_provider.dart';
 import 'package:flutter_todo_app/widgets/todo_details_widget.dart';
+import 'package:provider/provider.dart';
 import '../models/todo_item.dart';
 
 class ToDoItemWidget extends StatefulWidget {
@@ -36,6 +38,12 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       builder: (context) {
         return ToDoDetailsWidget(
           toDoItem: widget.toDoItem,
+          onEdit: (todo) {
+            context.read<ToDoProvider>().updateToDo(todo, null);
+            setState(() {
+              widget.toDoItem.copyFrom(todo);
+            });
+          },
         );
       },
     );
