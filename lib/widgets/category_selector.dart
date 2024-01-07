@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../models/category_item.dart';
-import '../providers/category_provider.dart';
 import '../screens/create_category_page.dart';
 
 class CategorySelector extends StatefulWidget {
   final Function(CategoryItem) onSelect;
+  final List<CategoryItem> categories;
 
-  const CategorySelector({super.key, required this.onSelect});
+  const CategorySelector(
+      {super.key, required this.categories, required this.onSelect});
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
@@ -34,16 +34,11 @@ class _CategorySelectorState extends State<CategorySelector> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CategoryProvider>(context, listen: true);
-    final categories = provider.choiceCategoryItems();
-
-    categories.add(CategoryItem(name: ""));
-
     return Wrap(
       spacing: 8.0,
       runSpacing: 8.0,
-      children: List.generate(categories.length, (index) {
-        final cat = categories[index];
+      children: List.generate(widget.categories.length, (index) {
+        final cat = widget.categories[index];
 
         if (cat.name.isEmpty) {
           return ChoiceChip(
@@ -72,7 +67,7 @@ class _CategorySelectorState extends State<CategorySelector> {
               setState(() {
                 selectedCategoryIndex = index;
               });
-              widget.onSelect(categories[index]);
+              widget.onSelect(widget.categories[index]);
             }
           },
         );

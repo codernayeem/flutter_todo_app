@@ -125,7 +125,8 @@ class CategoryProvider with ChangeNotifier {
       }
     }
 
-    return allCats;
+    // empty category for add icon button
+    return allCats + [CategoryItem(name: '')];
   }
 
   void reset() {
@@ -139,5 +140,9 @@ class CategoryProvider with ChangeNotifier {
     }
     recentCats.add(categoryItem);
     return true;
+  }
+
+  void notify() {
+    notifyListeners();
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/models/category_item.dart';
+import 'package:flutter_todo_app/providers/category_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../models/todo_item.dart';
 import '../widgets/category_selector.dart';
@@ -77,7 +79,6 @@ class _AddToDoPageState extends State<AddToDoPage> {
           category: _selectedCategory,
           checked: false),
     );
-
     Navigator.pop(context);
   }
 
@@ -90,6 +91,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<CategoryProvider>(context);
+    provider.removeListener(() {});
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 48, right: 16, bottom: 16),
       child: Column(
@@ -188,6 +191,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
           ),
           const SizedBox(height: 8),
           CategorySelector(
+            categories: provider.choiceCategoryItems(),
             onSelect: (selectedCategory) {
               _selectedCategory = selectedCategory;
             },

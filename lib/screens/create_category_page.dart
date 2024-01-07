@@ -15,7 +15,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
   final _nameController = TextEditingController();
   int selectedCategoryIconIndex = 0;
 
-  void _submitToDoData(CategoryProvider provider) {
+  void _submitCategoryData(CategoryProvider provider) {
     var name = _nameController.text.trim();
     if (name.isEmpty) {
       setState(() {
@@ -37,6 +37,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
       icon: categoryIcons.keys.elementAt(selectedCategoryIconIndex),
     ))) {
       Navigator.pop(context);
+      provider.notify();
     } else {
       print("This category already exits");
     }
@@ -130,7 +131,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
             getIconList(),
             const SizedBox(height: 16),
             FilledButton(
-                onPressed: () => _submitToDoData(provider),
+                onPressed: () => _submitCategoryData(provider),
                 child: const SizedBox(
                   width: double.infinity,
                   height: 50,
