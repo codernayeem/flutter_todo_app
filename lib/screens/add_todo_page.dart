@@ -9,7 +9,7 @@ import '../widgets/category_selector.dart';
 class AddToDoPage extends StatefulWidget {
   const AddToDoPage({super.key, required this.onAddToDo});
 
-  final void Function(ToDoItem expense) onAddToDo;
+  final void Function(ToDoItem todo) onAddToDo;
 
   @override
   State<AddToDoPage> createState() => _AddToDoPageState();
@@ -52,7 +52,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
     final lastDate = DateTime(now.year + 1001, now.month, now.day);
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: now,
+      initialDate: _selectedDate,
       firstDate: firstDate,
       lastDate: lastDate,
     );
