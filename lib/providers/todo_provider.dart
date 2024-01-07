@@ -30,14 +30,17 @@ class ToDoProvider with ChangeNotifier {
           await todosRef.where('user_id', isEqualTo: userId).get();
 
       _todoList = querySnapshot.docs
-          .map((doc) => ToDoItem(
-                id: doc.id,
-                title: doc["title"],
-                checked: doc["checked"],
-                date: DateTime.fromMillisecondsSinceEpoch(doc["date"]),
-                desc: doc["desc"],
-                category: CategoryItem(name: doc['category'], color: null),
-              ))
+          .map(
+            (doc) => ToDoItem(
+              id: doc.id,
+              title: doc["title"],
+              checked: doc["checked"],
+              date: DateTime.fromMillisecondsSinceEpoch(doc["date"]),
+              desc: doc["desc"],
+              category: CategoryItem(
+                  name: doc['category'], icon: doc['category_icon']),
+            ),
+          )
           .toList();
 
       _itemsLoaded = true;
@@ -59,6 +62,7 @@ class ToDoProvider with ChangeNotifier {
       "date": todo.date.millisecondsSinceEpoch,
       "desc": todo.desc,
       "category": todo.category.name,
+      "category_icon": todo.category.icon,
     });
 
     return insertIndex;
@@ -77,6 +81,7 @@ class ToDoProvider with ChangeNotifier {
   //     "date": todo.date,
   //     "desc": todo.desc,
   //     "category": todo.category,
+  //     "category": todo.category.icon,
   //   });
   // }
 

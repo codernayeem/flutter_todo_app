@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/category_item.dart';
+import '../providers/category_provider.dart';
+import '../screens/create_category_page.dart';
 
 class CategorySelector extends StatefulWidget {
-  final List<CategoryItem> categories;
   final Function(CategoryItem) onSelect;
 
-  const CategorySelector(
-      {super.key, required this.categories, required this.onSelect});
+  const CategorySelector({super.key, required this.onSelect});
 
   @override
-  _CategorySelectorState createState() => _CategorySelectorState();
+  State<CategorySelector> createState() => _CategorySelectorState();
 }
 
 class _CategorySelectorState extends State<CategorySelector> {
@@ -21,37 +22,61 @@ class _CategorySelectorState extends State<CategorySelector> {
     selectedCategoryIndex = 0; // Select the first category by default
   }
 
+  void onAddCategoryClick(bool _) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return const CreateCategoryPage();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // padding: const EdgeInsets.all(8.0),
-      child: Wrap(
-        spacing: 8.0,
-        runSpacing: 8.0,
-        children: List.generate(widget.categories.length, (index) {
+    final provider = Provider.of<CategoryProvider>(context, listen: true);
+    final categories = provider.choiceCategoryItems();
+
+    categories.add(CategoryItem(name: ""));
+
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 8.0,
+      children: List.generate(categories.length, (index) {
+        final cat = categories[index];
+
+        if (cat.name.isEmpty) {
           return ChoiceChip(
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(widget.categories[index].icon),
-                const SizedBox(width: 4.0),
-                Text(widget.categories[index].name),
-              ],
-            ),
+            label: const Icon(Icons.add),
             selected: selectedCategoryIndex == index,
-            onSelected: (selected) {
-              if (selected) {
-                setState(() {
-                  selectedCategoryIndex = index;
-                });
-                widget.onSelect(widget.categories[index]);
-              }
-            },
-            // selectedColor: widget.categories[index].color,
-            // selectedColor: const Color.fromARGB(255, 237, 192, 183),
+            onSelected: onAddCategoryClick,
           );
-        }),
-      ),
+        }
+
+        final icon = cat.getIcon();
+        return InputChip(
+          showCheckmark: false,
+          label: (icon != null)
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon),
+                    const SizedBox(width: 4.0),
+                    Text(cat.name),
+                  ],
+                )
+              : Text(cat.name),
+          selected: selectedCategoryIndex == index,
+          onSelected: (selected) {
+            if (selected) {
+              setState(() {
+                selectedCategoryIndex = index;
+              });
+              widget.onSelect(categories[index]);
+            }
+          },
+        );
+      }),
     );
   }
 }

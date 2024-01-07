@@ -7,6 +7,8 @@ class CategoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = cat.category.getIcon();
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.all(8),
@@ -27,12 +29,9 @@ class CategoryView extends StatelessWidget {
             style: Theme.of(context).textTheme.labelLarge,
           ),
           Row(
-            children: cat.category.icon != null
+            children: icon != null
                 ? [
-                    Icon(
-                      cat.category.icon,
-                      size: 20,
-                    ),
+                    Icon(icon, size: 20),
                     const SizedBox(width: 4),
                     Text(
                       cat.category.name,

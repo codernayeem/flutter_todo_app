@@ -94,8 +94,50 @@ class CategoryProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  List<CategoryItem> recentCats = [];
+  List<CategoryItem> tempCats = [
+    CategoryItem(name: 'Food', icon: "food"),
+    CategoryItem(name: 'Work', icon: "work"),
+    CategoryItem(name: 'Travel', icon: "travel"),
+    CategoryItem(name: 'Study', icon: "study"),
+  ];
+
+  List<CategoryItem> choiceCategoryItems() {
+    List<CategoryItem> allCats = [CategoryItem.defaultCat()];
+    List<CategoryItem> _tempCats = tempCats;
+    List<CategoryItem> _recentCats = recentCats;
+
+    for (var element in _categoriesList) {
+      if (element.category.name != "General") {
+        allCats.add(element.category);
+      }
+      _tempCats.removeWhere((cat) => cat.name == element.category.name);
+      _recentCats.removeWhere((cat) => cat.name == element.category.name);
+    }
+
+    allCats += recentCats;
+
+    if (allCats.length < 5 && _tempCats.isNotEmpty) {
+      for (int i = allCats.length, k = 0;
+          i < 5 && _tempCats.length != k;
+          i++, k++) {
+        allCats.add(_tempCats[k]);
+      }
+    }
+
+    return allCats;
+  }
+
   void reset() {
     _categoriesList.clear();
     _categoriesLoaded = false;
+  }
+
+  bool addRecentCategory(CategoryItem categoryItem) {
+    if (findCategoryIndexByName(categoryItem.name) != -1) {
+      return false;
+    }
+    recentCats.add(categoryItem);
+    return true;
   }
 }

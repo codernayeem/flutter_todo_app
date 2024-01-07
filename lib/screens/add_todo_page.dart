@@ -93,6 +93,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 48, right: 16, bottom: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +131,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                       )
                     : TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
                 curve: Curves.ease,
@@ -177,30 +178,16 @@ class _AddToDoPageState extends State<AddToDoPage> {
             ),
           ),
           const SizedBox(height: 16),
+          const Text(
+            "Category",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              height: 0,
+            ),
+          ),
+          const SizedBox(height: 8),
           CategorySelector(
-            categories: [
-              CategoryItem.defaultCat(),
-              CategoryItem(
-                  name: 'Food',
-                  icon: categoryIcons["food"],
-                  color: const Color.fromARGB(255, 236, 185, 169)),
-              CategoryItem(
-                  name: 'Work',
-                  icon: categoryIcons["work"],
-                  color: const Color.fromARGB(255, 35, 233, 45)),
-              CategoryItem(
-                  name: 'Travel',
-                  icon: categoryIcons["travel"],
-                  color: const Color.fromARGB(255, 27, 243, 160)),
-              CategoryItem(
-                  name: 'Study',
-                  icon: categoryIcons["study"],
-                  color: const Color.fromARGB(255, 233, 74, 236)),
-              CategoryItem(
-                  name: 'Others',
-                  icon: categoryIcons["others"],
-                  color: const Color.fromARGB(255, 245, 180, 38)),
-            ],
             onSelect: (selectedCategory) {
               _selectedCategory = selectedCategory;
             },
@@ -212,8 +199,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
               "Description (Optional)",
               style: TextStyle(
                 fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 height: 0,
               ),
             ),

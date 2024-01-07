@@ -64,7 +64,10 @@ class _CaegoryListViewState extends State<CaegoryListView> {
       scrollDirection: Axis.horizontal,
       itemCount: categoriesList.length,
       itemBuilder: (context, index) {
-        return CategoryView(categoriesList[index]);
+        return CategoryView(
+          key: ValueKey(categoriesList[index].category.name),
+          categoriesList[index],
+        );
       },
     );
   }

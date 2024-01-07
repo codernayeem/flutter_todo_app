@@ -4,7 +4,8 @@ import 'package:uuid/uuid.dart';
 const uuid = Uuid();
 
 const categoryIcons = {
-  "general": Icons.notes_sharp,
+  "no_icon": null,
+  "notes_sharp": Icons.notes_sharp,
   "food": Icons.lunch_dining_outlined,
   "travel": Icons.flight_takeoff_rounded,
   "leisure": Icons.movie_creation_outlined,
@@ -16,18 +17,18 @@ const categoryIcons = {
 class CategoryItem {
   CategoryItem({
     required this.name,
-    required this.color,
-    this.icon,
-  }) : id = uuid.v4();
+    this.icon = "",
+  });
 
-  String id;
   String name;
-  IconData? icon;
-  Color? color;
+  String icon;
 
   static CategoryItem defaultCat() {
-    return CategoryItem(
-        name: "General", icon: categoryIcons["general"], color: Colors.blue);
+    return CategoryItem(name: "General", icon: 'notes_sharp');
+  }
+
+  IconData? getIcon() {
+    return categoryIcons[icon];
   }
 }
 

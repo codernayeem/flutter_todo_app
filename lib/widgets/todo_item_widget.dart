@@ -31,6 +31,8 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final icon = widget.toDoItem.category.getIcon();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
       child: Row(
@@ -86,12 +88,10 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
                                 ? null
                                 : Chip(
                                     labelStyle: const TextStyle(fontSize: 13),
-                                    label: (widget.toDoItem.category.icon !=
-                                            null)
+                                    label: (icon != null)
                                         ? Row(
                                             children: [
-                                              Icon(widget
-                                                  .toDoItem.category.icon),
+                                              Icon(icon),
                                               const SizedBox(width: 4.0),
                                               Text(widget
                                                   .toDoItem.category.name),
