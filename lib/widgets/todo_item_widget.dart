@@ -35,6 +35,8 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
   void onClick() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) {
         return ToDoDetailsWidget(
           toDoItem: widget.toDoItem,

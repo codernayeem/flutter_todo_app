@@ -88,8 +88,9 @@ class _ToDoItemWDetailstState extends State<ToDoDetailsWidget> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Edit Task Descriptions"),
-          content: Expanded(
+          title: const Text("Edit Task Description"),
+          content: SizedBox(
+            height: 260,
             child: TextField(
               expands: true,
               controller: _descController,
@@ -151,134 +152,136 @@ class _ToDoItemWDetailstState extends State<ToDoDetailsWidget> {
   Widget build(BuildContext context) {
     final icon = widget.toDoItem.category.getIcon();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const SelectableText(
-                "Task Title",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Text(widget.toDoItem.formattedDate),
-                  IconButton(
-                    onPressed: _datePicker,
-                    icon: const Icon(
-                      Icons.calendar_month,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    widget.toDoItem.title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SelectableText(
+                  "Task Title",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              IconButton(onPressed: onEditTitle, icon: const Icon(Icons.edit))
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Text(
-                "Category: ",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Chip(
-                labelStyle: const TextStyle(fontSize: 13),
-                padding: const EdgeInsets.all(0),
-                label: (icon != null)
-                    ? Row(
-                        children: [
-                          Icon(icon),
-                          const SizedBox(width: 4.0),
-                          Text(widget.toDoItem.category.name),
-                        ],
-                      )
-                    : Text(widget.toDoItem.category.name),
-              ),
-            ],
-          ),
-          Container(
-            child: widget.toDoItem.desc.isEmpty
-                ? Row(
-                    children: [
-                      const Text(
-                        " No Description",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                const Spacer(),
+                Row(
+                  children: [
+                    Text(widget.toDoItem.formattedDate),
+                    IconButton(
+                      onPressed: _datePicker,
+                      icon: const Icon(
+                        Icons.calendar_month,
                       ),
-                      IconButton(
-                          onPressed: onEditDesc, icon: const Icon(Icons.edit))
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Text(
-                            "Description :",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      widget.toDoItem.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(onPressed: onEditTitle, icon: const Icon(Icons.edit))
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Text(
+                  "Category: ",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Chip(
+                  labelStyle: const TextStyle(fontSize: 13),
+                  padding: const EdgeInsets.all(0),
+                  label: (icon != null)
+                      ? Row(
+                          children: [
+                            Icon(icon),
+                            const SizedBox(width: 4.0),
+                            Text(widget.toDoItem.category.name),
+                          ],
+                        )
+                      : Text(widget.toDoItem.category.name),
+                ),
+              ],
+            ),
+            Container(
+              child: widget.toDoItem.desc.isEmpty
+                  ? Row(
+                      children: [
+                        const Text(
+                          " No Description",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: onEditDesc, icon: const Icon(Icons.edit))
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              "Description :",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            IconButton(
+                                onPressed: onEditDesc,
+                                icon: const Icon(Icons.edit))
+                          ],
+                        ),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: SelectableText(
+                            widget.toDoItem.desc,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
-                          IconButton(
-                              onPressed: onEditDesc,
-                              icon: const Icon(Icons.edit))
-                        ],
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: SelectableText(
-                          widget.toDoItem.desc,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ],
+                      ],
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

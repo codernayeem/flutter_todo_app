@@ -47,8 +47,6 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<CategoryProvider>(context, listen: true);
 
-    // final categories = provider.choiceCategoryItems();
-
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 48, right: 16, bottom: 16),
       child: SizedBox(

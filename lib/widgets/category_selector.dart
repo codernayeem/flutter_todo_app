@@ -25,6 +25,7 @@ class _CategorySelectorState extends State<CategorySelector> {
   void onAddCategoryClick(bool _) {
     showModalBottomSheet(
       isScrollControlled: true,
+      useSafeArea: true,
       context: context,
       builder: (context) {
         return const CreateCategoryPage();
