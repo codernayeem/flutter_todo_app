@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
 import 'package:flutter_todo_app/providers/category_provider.dart';
+import 'package:flutter_todo_app/screens/settings_page.dart';
 import 'package:flutter_todo_app/services/auth_services.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -317,7 +318,15 @@ class _MyHomePageState extends State<MyHomePage> {
           rightCornerRadius: 8,
           splashRadius: 0,
           elevation: 32,
-          onTap: (index) => setState(() => _bottomNavIndex = index),
+          onTap: (index) {
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            }
+            // setState(() => _bottomNavIndex = index);
+          },
         ),
         const Padding(
           padding: EdgeInsets.only(bottom: 4),
