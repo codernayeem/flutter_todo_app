@@ -6,12 +6,17 @@ const uuid = Uuid();
 const categoryIcons = {
   "no_icon": null,
   "notes_sharp": Icons.notes_sharp,
-  "food": Icons.lunch_dining_outlined,
-  "travel": Icons.flight_takeoff_rounded,
-  "leisure": Icons.movie_creation_outlined,
-  "work": Icons.work_outline,
-  "study": Icons.edit_outlined,
-  "others": Icons.other_houses_outlined,
+  "lunch_dining_outlined": Icons.lunch_dining_outlined,
+  "flight_takeoff_rounded": Icons.flight_takeoff_rounded,
+  "movie_creation_outlined": Icons.movie_creation_outlined,
+  "work_outline": Icons.work_outline,
+  "edit_outlined": Icons.edit_outlined,
+  "other_houses_outlined": Icons.other_houses_outlined,
+  "notification_important_outlined": Icons.notification_important_outlined,
+  "note": Icons.note,
+  "note_alt_outlined": Icons.note_alt_outlined,
+  "not_listed_location_outlined": Icons.not_listed_location_outlined,
+  "add_a_photo": Icons.add_a_photo,
 };
 
 class CategoryItem {

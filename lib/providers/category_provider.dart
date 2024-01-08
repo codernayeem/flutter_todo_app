@@ -96,10 +96,10 @@ class CategoryProvider with ChangeNotifier {
 
   List<CategoryItem> recentCats = [];
   List<CategoryItem> tempCats = [
-    CategoryItem(name: 'Food', icon: "food"),
-    CategoryItem(name: 'Work', icon: "work"),
-    CategoryItem(name: 'Travel', icon: "travel"),
-    CategoryItem(name: 'Study', icon: "study"),
+    CategoryItem(name: 'Movie', icon: "movie_creation_outlined"),
+    CategoryItem(name: 'Work', icon: "work_outline"),
+    CategoryItem(name: 'Travel', icon: "flight_takeoff_rounded"),
+    CategoryItem(name: 'Study', icon: "edit_outlined"),
   ];
 
   List<CategoryItem> choiceCategoryItems() {
